@@ -268,7 +268,7 @@ static inline void ion_client_destroy(struct ion_client *client) { }
 
 static inline struct ion_handle *ion_alloc(struct ion_client *client,
 					size_t len, size_t align,
-					unsigned int heap_mask,
+					unsigned int heap_id_mask,
 					unsigned int flags)
 {
 	return ERR_PTR(-ENODEV);
