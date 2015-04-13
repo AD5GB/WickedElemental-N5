@@ -2020,6 +2020,58 @@ static void adreno_vbif_clear_pending_transactions(struct kgsl_device *device)
 	adreno_writereg(adreno_dev, ADRENO_REG_VBIF_XIN_HALT_CTRL0, 0);
 }
 
+static int _status;
+
+/**
+ * _adreno_start_work() - Work handler for the low latency adreno_start
+ * @work: Pointer to the work_struct for
+ *
+ * The work callbak for the low lantecy GPU start - this executes the core
+ * _adreno_start function in the workqueue.
+ */
+static void adreno_start_work(struct work_struct *work)
+{
+	struct adreno_device *adreno_dev = container_of(work,
+		struct adreno_device, start_work);
+	struct kgsl_device *device = &adreno_dev->dev;
+
+	/* Nice ourselves to be higher priority but not too high priority */
+	set_user_nice(current, _wake_nice);
+
+	mutex_lock(&device->mutex);
+	_status = _adreno_start(adreno_dev);
+	mutex_unlock(&device->mutex);
+}
+
+/**
+ * adreno_start() - Power up and initialize the GPU
+ * @device: Pointer to the KGSL device to power up
+ * @priority:  Boolean flag to specify of the start should be scheduled in a low
+ * latency work queue
+ *
+ * Power up the GPU and initialize it.  If priority is specified then queue the
+ * start function in a high priority queue for lower latency.
+ */
+static int adreno_start(struct kgsl_device *device, int priority)
+{
+	struct adreno_device *adreno_dev = ADRENO_DEVICE(device);
+
+	/* No priority (normal latency) call the core start function directly */
+	if (!priority)
+		return _adreno_start(adreno_dev);
+
+	/*
+	 * If priority is specified (low latency) then queue the work in a
+	 * higher priority work queue and wait for it to finish
+	 */
+	queue_work(adreno_wq, &adreno_dev->start_work);
+	mutex_unlock(&device->mutex);
+	flush_work(&adreno_dev->start_work);
+	mutex_lock(&device->mutex);
+
+	return _status;
+}
+
 static int adreno_stop(struct kgsl_device *device)
 {
 	struct adreno_device *adreno_dev = ADRENO_DEVICE(device);
