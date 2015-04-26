@@ -913,8 +913,8 @@ static int audit_filter_inode_name(struct task_struct *tsk,
 	int word, bit;
 	int h = audit_hash_ino((u32)n->ino);
 	struct list_head *list = &audit_inode_hash[h];
-	struct audit_entry *e;
-	enum audit_state state;
+	struct audit_entry *e = NULL;
+	enum audit_state state = AUDIT_DISABLED;
 
 	word = AUDIT_WORD(ctx->major);
 	bit  = AUDIT_BIT(ctx->major);
@@ -925,8 +925,7 @@ static int audit_filter_inode_name(struct task_struct *tsk,
 	list_for_each_entry_rcu(e, list, list) {
 		if ((e->rule.mask[word] & bit) == bit &&
 		    audit_filter_rules(tsk, &e->rule, ctx, n, &state, false)) {
-			ctx->current_state = state;
-			return 1;
+			ctx->current_state = state; return 1;
 		}
 	}
 

@@ -2872,12 +2872,12 @@ static inline int started_after(void *p1, void *p2)
 int cgroup_scan_tasks(struct cgroup_scanner *scan)
 {
 	int retval, i;
-	struct cgroup_iter it;
-	struct task_struct *p, *dropped;
+	struct cgroup_iter it = { 0, 0 };
+	struct task_struct *p = NULL, *dropped = NULL;
 	/* Never dereference latest_task, since it's not refcounted */
 	struct task_struct *latest_task = NULL;
 	struct ptr_heap tmp_heap;
-	struct ptr_heap *heap;
+	struct ptr_heap *heap = NULL;
 	struct timespec latest_time = { 0, 0 };
 
 	if (scan->heap) {

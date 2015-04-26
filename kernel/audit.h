@@ -33,7 +33,7 @@
    a per-task filter.  At syscall entry, the audit_state is augmented by
    the syscall filter. */
 enum audit_state {
-	AUDIT_DISABLED,		/* Do not create per-task audit_context.
+	AUDIT_DISABLED=0,		/* Do not create per-task audit_context.
 				 * No syscall-specific audit records can
 				 * be generated. */
 	AUDIT_BUILD_CONTEXT,	/* Create the per-task audit_context,
