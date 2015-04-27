@@ -254,7 +254,7 @@ bool each_symbol_section(bool (*fn)(const struct symsearch *arr,
 				    void *data),
 			 void *data)
 {
-	struct module *mod;
+	struct module *mod = NULL;
 	static const struct symsearch arr[] = {
 		{ __start___ksymtab, __stop___ksymtab, __start___kcrctab,
 		  NOT_GPL_ONLY, false },
@@ -371,7 +371,7 @@ static bool find_symbol_in_section(const struct symsearch *syms,
 				   void *data)
 {
 	struct find_symbol_arg *fsa = data;
-	struct kernel_symbol *sym;
+	struct kernel_symbol *sym = NULL;
 
 	sym = bsearch(fsa->name, syms->start, syms->stop - syms->start,
 			sizeof(struct kernel_symbol), cmp_name);
@@ -868,7 +868,7 @@ static inline void print_unload_info(struct seq_file *m, struct module *mod)
 
 void __symbol_put(const char *symbol)
 {
-	struct module *owner;
+	struct module *owner = NULL;
 
 	preempt_disable();
 	if (!find_symbol(symbol, &owner, NULL, true, false))
@@ -1200,9 +1200,9 @@ static const struct kernel_symbol *resolve_symbol(struct module *mod,
 						  const char *name,
 						  char ownername[])
 {
-	struct module *owner;
+	struct module *owner = NULL;
 	const struct kernel_symbol *sym;
-	const unsigned long *crc;
+	const unsigned long *crc = NULL;
 	int err;
 
 	mutex_lock(&module_mutex);
@@ -1838,7 +1838,7 @@ static void free_module(struct module *mod)
 
 void *__symbol_get(const char *symbol)
 {
-	struct module *owner;
+	struct module *owner = NULL;
 	const struct kernel_symbol *sym;
 
 	preempt_disable();
@@ -1860,7 +1860,7 @@ EXPORT_SYMBOL_GPL(__symbol_get);
 static int verify_export_symbols(struct module *mod)
 {
 	unsigned int i;
-	struct module *owner;
+	struct module *owner = NULL;
 	const struct kernel_symbol *s;
 	struct {
 		const struct kernel_symbol *sym;
