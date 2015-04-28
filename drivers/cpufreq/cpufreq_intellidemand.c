@@ -367,7 +367,7 @@ static void intellidemand_powersave_bias_init(void)
         }
 }
 
-void intellidemand_boost_cpu(int boost)
+static void intellidemand_boost_cpu(int boost)
 {
         int cpu;
 
