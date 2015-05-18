@@ -1,6 +1,13 @@
 #
 # Makefile for MMC/SD host controller drivers
 #
+#
+#
+# RDD - HACKS!
+HOST_CFLAGS += -Wno-array-bounds
+KBUILD_CFLAGS += -Wno-array-bounds
+CFLAGS_KERNEL += -Wno-array-bounds
+CFLAGS_MODULE += -Wno-array-bounds
 
 obj-$(CONFIG_MMC_ARMMMCI)	+= mmci.o
 obj-$(CONFIG_MMC_PXA)		+= pxamci.o

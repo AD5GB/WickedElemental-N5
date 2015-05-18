@@ -193,9 +193,10 @@ static int do_kimage_alloc(struct kimage **rimage, unsigned long entry,
 		mstart = image->segment[i].mem;
 		mend   = mstart + image->segment[i].memsz;
 		for (j = 0; j < i; j++) {
-			unsigned long pstart, pend;
-			pstart = image->segment[j].mem;
-			pend   = pstart + image->segment[j].memsz;
+			unsigned long pstart, pend, seg_idx;
+			seg_idx = ( (j < KEXEC_SEGMENT_MAX) ? j : KEXEC_SEGMENT_MAX);
+			pstart = image->segment[seg_idx].mem;
+			pend   = pstart + image->segment[seg_idx].memsz;
 			/* Do the segments overlap ? */
 			if ((mend > pstart) && (mstart < pend))
 				goto out;
@@ -344,10 +345,11 @@ static int kimage_is_destination_range(struct kimage *image,
 	unsigned long i;
 
 	for (i = 0; i < image->nr_segments; i++) {
-		unsigned long mstart, mend;
+		unsigned long mstart, mend, seg_idx;
+		seg_idx = ( (i < KEXEC_SEGMENT_MAX) ? i : KEXEC_SEGMENT_MAX);
 
-		mstart = image->segment[i].mem;
-		mend = mstart + image->segment[i].memsz;
+		mstart = image->segment[seg_idx].mem;
+		mend = mstart + image->segment[seg_idx].memsz;
 		if ((end > mstart) && (start < mend))
 			return 1;
 	}
@@ -502,10 +504,11 @@ static struct page *kimage_alloc_crash_control_pages(struct kimage *image,
 			break;
 		/* See if I overlap any of the segments */
 		for (i = 0; i < image->nr_segments; i++) {
-			unsigned long mstart, mend;
+			unsigned long mstart, mend, seg_idx;
 
-			mstart = image->segment[i].mem;
-			mend   = mstart + image->segment[i].memsz - 1;
+			seg_idx = ( (i < KEXEC_SEGMENT_MAX) ? i : KEXEC_SEGMENT_MAX);
+			mstart = image->segment[seg_idx].mem;
+			mend   = mstart + image->segment[seg_idx].memsz - 1;
 			if ((hole_end >= mstart) && (hole_start <= mend)) {
 				/* Advance the hole to the end of the segment */
 				hole_start = (mend + (size - 1)) & ~(size - 1);

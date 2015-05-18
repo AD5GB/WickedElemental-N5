@@ -382,8 +382,13 @@ static int shmem_free_swap(struct address_space *mapping,
 static void shmem_deswap_pagevec(struct pagevec *pvec)
 {
 	int i, j;
+	unsigned pv_count;
 
-	for (i = 0, j = 0; i < pagevec_count(pvec); i++) {
+	pv_count = ((pagevec_count(pvec) < PAGEVEC_SIZE) ? pagevec_count(pvec) : PAGEVEC_SIZE );
+
+
+	/*for (i = 0, j = 0; i < pagevec_count(pvec); i++) {*/
+	for (i = 0, j = 0; i < pv_count; i++) {
 		struct page *page = pvec->pages[i];
 		if (!radix_tree_exceptional_entry(page))
 			pvec->pages[j++] = page;

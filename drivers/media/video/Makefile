@@ -2,6 +2,11 @@
 # Makefile for the video capture/playback device drivers.
 #
 
+# RDD - HACKS!
+HOST_CFLAGS += -Wno-array-bounds
+KBUILD_CFLAGS += -Wno-array-bounds
+CFLAGS_KERNEL += -Wno-array-bounds
+CFLAGS_MODULE += -Wno-array-bounds
 tuner-objs	:=	tuner-core.o
 
 msp3400-objs	:=	msp3400-driver.o msp3400-kthreads.o

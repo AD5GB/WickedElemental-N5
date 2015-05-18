@@ -1,6 +1,12 @@
 #
 # Makefile for the Linux TCP/IP (INET) layer.
 #
+#
+# RDD - HACKS!
+HOST_CFLAGS += -Wno-array-bounds
+KBUILD_CFLAGS += -Wno-array-bounds
+CFLAGS_KERNEL += -Wno-array-bounds
+CFLAGS_MODULE += -Wno-array-bounds
 
 obj-y     := route.o inetpeer.o protocol.o \
 	     ip_input.o ip_fragment.o ip_forward.o ip_options.o \

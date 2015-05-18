@@ -1,6 +1,13 @@
 #
 # Makefile for ALSA
 #
+#
+#
+# RDD - HACKS!
+HOST_CFLAGS += -Wno-array-bounds
+KBUILD_CFLAGS += -Wno-array-bounds
+CFLAGS_KERNEL += -Wno-array-bounds
+CFLAGS_MODULE += -Wno-array-bounds
 
 snd-usb-audio-objs := 	card.o \
 			clock.o \

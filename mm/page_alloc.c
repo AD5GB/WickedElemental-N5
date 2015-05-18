@@ -1678,7 +1678,7 @@ static bool __zone_watermark_ok(struct zone *z, int order, unsigned long mark,
 		return false;
 	for (o = 0; o < order; o++) {
 		/* At the next order, this order's pages become unavailable */
-		free_pages -= z->free_area[o].nr_free << o;
+		free_pages -= z->free_area[o < order ? o : order].nr_free << o;
 
 		/* Require fewer higher order pages to be free */
 		min >>= min_free_order_shift;

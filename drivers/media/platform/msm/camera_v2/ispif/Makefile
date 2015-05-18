@@ -1,3 +1,8 @@
+# RDD - HACKS !
+HOST_CFLAGS += -Wno-array-bounds
+KBUILD_CFLAGS += -Wno-array-bounds
+CFLAGS_KERNEL += -Wno-array-bounds
+CFLAGS_MODULE += -Wno-array-bounds
 ccflags-y := -Wno-maybe-uninitialized
 ccflags-y += -Idrivers/media/platform/msm/camera_v2
 ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/io
