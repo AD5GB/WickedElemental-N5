@@ -2089,40 +2089,40 @@ static struct android_usb_function uasp_function = {
 	.bind_config	= uasp_function_bind_config,
 };
 
-static int midi_function_init(struct android_usb_function *f,
-					struct usb_composite_dev *cdev)
+static int hid_function_init(struct android_usb_function *f, struct usb_composite_dev *cdev)
 {
-	struct midi_alsa_config *config;
+	return ghid_setup(cdev->gadget, 2);
+}
 
-	config = kzalloc(sizeof(struct midi_alsa_config), GFP_KERNEL);
-	f->config = config;
-	if (!config)
-		return -ENOMEM;
-	config->card = -1;
-	config->device = -1;
+static void hid_function_cleanup(struct android_usb_function *f)
+{
+	ghid_cleanup();
+}
+
+static int hid_function_bind_config(struct android_usb_function *f, struct usb_configuration *c)
+{
+	int ret;
+	printk(KERN_INFO "hid keyboard\n");
+	ret = hidg_bind_config(c, &ghid_device_android_keyboard, 0);
+	if (ret) {
+		pr_info("%s: hid_function_bind_config keyboard failed: %d\n", __func__, ret);
+		return ret;
+	}
+	printk(KERN_INFO "hid mouse\n");
+	ret = hidg_bind_config(c, &ghid_device_android_mouse, 1);
+	if (ret) {
+		pr_info("%s: hid_function_bind_config mouse failed: %d\n", __func__, ret);
+		return ret;
+	}
 	return 0;
 }
 
-static void midi_function_cleanup(struct android_usb_function *f)
-{
-	kfree(f->config);
-}
-
-static int midi_function_bind_config(struct android_usb_function *f,
-						struct usb_configuration *c)
-{
-	struct midi_alsa_config *config = f->config;
-
-	return f_midi_bind_config(c, SNDRV_DEFAULT_IDX1, SNDRV_DEFAULT_STR1,
-			MIDI_INPUT_PORTS, MIDI_OUTPUT_PORTS, MIDI_BUFFER_SIZE,
-			MIDI_QUEUE_LENGTH, config);
-}
-
-static ssize_t midi_alsa_show(struct device *dev,
-		struct device_attribute *attr, char *buf)
-{
-	struct android_usb_function *f = dev_get_drvdata(dev);
-	struct midi_alsa_config *config = f->config;
+static struct android_usb_function hid_function = {
+	.name		= "hid",
+	.init		= hid_function_init,
+	.cleanup	= hid_function_cleanup,
+	.bind_config	= hid_function_bind_config,
+};
 
 	/* print ALSA card and device numbers */
 	return sprintf(buf, "%d %d\n", config->card, config->device);
@@ -2174,7 +2174,7 @@ static struct android_usb_function *supported_functions[] = {
 #endif
 	&midi_function,
 	&uasp_function,
-/* RDD 	&hid_function, */
+	&hid_function,
 	NULL
 };
 
@@ -2480,8 +2480,8 @@ functions_store(struct device *pdev, struct device_attribute *attr,
 			}
 		}
 		/* HID driver always enabled, it's the whole point of this kernel patch */
-		if (hid_enabled)
-			android_enable_function(dev, conf, "hid");
+		android_enable_function(dev, conf, "hid");
+
 	}
 
 	/* Free uneeded configurations if exists */
